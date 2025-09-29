@@ -1,18 +1,14 @@
 import { Suspense } from "react";
 
 import LoginForm from "@/features/auth/components/login-form";
-import { Card, CardContent } from "@workspace/ui/components/card";
+import { Skeleton } from "@workspace/ui/components/skeleton";
 
 export default function LoginPage() {
   return (
     <div className="w-full max-w-sm">
-      <Card className="p-0 overflow-hidden">
-        <CardContent>
-          <Suspense fallback={<div>Loading...</div>}>
-            <LoginForm />
-          </Suspense>
-        </CardContent>
-      </Card>
+      <Suspense fallback={<Skeleton className="w-full h-[516px]" />}>
+        <LoginForm />
+      </Suspense>
     </div>
   );
 }

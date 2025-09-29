@@ -1,38 +1,45 @@
 "use client";
 
 import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { toast } from "sonner";
 
 import { AUTH_PATH } from "@/constants/paths";
 import {
-  VerifyEmailInput,
-  verifyEmailSchema,
-} from "@/features/auth/schemas/email.schema";
+  forgotPasswordEmailStep,
+  forgotPasswordOtpStep,
+  forgotPasswordResetPasswordStep,
+} from "@/features//auth/utils/forgot-password";
 import {
-  verifiEmailEmailStep,
-  verifiEmailOtpStep,
-} from "@/features/auth/utils/email";
+  ForgotPasswordInput,
+  forgotPasswordSchema,
+} from "@/features/auth/schemas/forgot-password";
 import {
   authClient,
   getApiErrorDetail,
   isApiErrorCode,
 } from "@/lib/auth-client";
-import { MultipleStepForm } from "@workspace/ui/components/multiple-step-form";
 import { buttonVariants } from "@workspace/ui/components/button";
-import { toast } from "sonner";
+import { MultipleStepForm } from "@workspace/ui/components/multiple-step-form";
 
 type Props = {
-  initialValues?: Partial<VerifyEmailInput>;
+  initialValues?: Partial<ForgotPasswordInput>;
   initialStep?: number;
 };
 
-export default function VerifyEmailForm({
-  initialValues = { email: "", otp: "" },
+export default function ForgotPasswordForm({
+  initialValues = {
+    email: "",
+    otp: "",
+    newPassword: "",
+    confirmNewPassword: "",
+  },
   initialStep,
 }: Props) {
-  const handleSubmit = async (values: VerifyEmailInput) => {
-    const { error } = await authClient.emailOtp.verifyEmail({
+  const handleSubmit = async (values: ForgotPasswordInput) => {
+    const { error } = await authClient.emailOtp.resetPassword({
       email: values.email,
       otp: values.otp,
+      password: values.newPassword,
     });
 
     if (error) {
@@ -48,11 +55,15 @@ export default function VerifyEmailForm({
 
   return (
     <MultipleStepForm
-      steps={[verifiEmailEmailStep, verifiEmailOtpStep]}
-      schema={verifyEmailSchema}
+      steps={[
+        forgotPasswordEmailStep,
+        forgotPasswordOtpStep,
+        forgotPasswordResetPasswordStep,
+      ]}
+      schema={forgotPasswordSchema}
       initialValues={initialValues}
       initialStep={initialStep}
-      submitLabel="Verify"
+      submitLabel="Reset password"
       onSubmit={handleSubmit}
     >
       {/* Completed Placeholder */}
@@ -61,10 +72,11 @@ export default function VerifyEmailForm({
           <CheckCircle2 className="text-primary h-8 w-8" />
         </div>
         <h2 className="mb-2 text-2xl font-bold">
-          Email Verified Successfully!
+          Password Reset Successfully!
         </h2>
         <p className="text-muted-foreground">
-          You can now proceed to login with your verified email.
+          Your password has been updated. You can now log in with your new
+          password.
         </p>
         <a href={AUTH_PATH.LOGIN} className={buttonVariants()}>
           Go to Login

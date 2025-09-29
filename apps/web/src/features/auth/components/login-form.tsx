@@ -19,6 +19,7 @@ import {
   isApiErrorCode,
 } from "@/lib/auth-client";
 import { Button } from "@workspace/ui/components/button";
+import { Card, CardContent } from "@workspace/ui/components/card";
 import { Checkbox } from "@workspace/ui/components/checkbox";
 import {
   Form,
@@ -64,7 +65,7 @@ export default function LoginForm() {
         }
 
         const errorDetail = getApiErrorDetail(error?.code);
-        toast.error(errorDetail.title, {
+        toast.warning(errorDetail.title, {
           description: errorDetail.description,
         });
         return;
@@ -86,94 +87,101 @@ export default function LoginForm() {
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="py-6">
-        <div className="space-y-6">
-          <div className="flex flex-col items-center text-center">
-            <h1 className="text-2xl font-bold">Welcome back</h1>
-            <p className="text-muted-foreground text-balance">
-              Login to your Next Chat App account
-            </p>
-          </div>
+    <Card className="p-0 overflow-hidden">
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="py-6">
+            <div className="space-y-6">
+              <div className="flex flex-col items-center text-center">
+                <h1 className="text-2xl font-bold">Welcome back</h1>
+                <p className="text-muted-foreground text-balance">
+                  Login to your (App_Name) account
+                </p>
+              </div>
 
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input
-                    type="email"
-                    placeholder="shadcn@example.com"
-                    autoComplete="username"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <div className="flex items-center">
-                  <FormLabel>Password</FormLabel>
-                  <Link
-                    href={AUTH_PATH.FORGOT_PASSWORD}
-                    className="ml-auto text-sm leading-none font-medium hover:underline"
-                  >
-                    Forgot your password?
-                  </Link>
-                </div>
-                <FormControl>
-                  <PasswordInput
-                    {...field}
-                    placeholder="Enter your password"
-                    autoComplete="current-password"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="rememberMe"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-center gap-2">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-                <FormLabel>Remember Me</FormLabel>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending && <Loader2 className="mr-1 animate-spin" />}
-            Login
-          </Button>
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="shadcn@example.com"
+                        autoComplete="username"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center">
+                      <FormLabel>Password</FormLabel>
+                      <Link
+                        href={AUTH_PATH.FORGOT_PASSWORD}
+                        className="ml-auto text-sm leading-none font-medium hover:underline"
+                      >
+                        Forgot your password?
+                      </Link>
+                    </div>
+                    <FormControl>
+                      <PasswordInput
+                        {...field}
+                        placeholder="Enter your password"
+                        autoComplete="current-password"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="rememberMe"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center gap-2">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormLabel>Remember Me</FormLabel>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className="w-full" disabled={isPending}>
+                {isPending && <Loader2 className="mr-1 animate-spin" />}
+                Login
+              </Button>
 
-          <div className="relative text-sm text-center after:border-border after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-            <span className="relative z-10 px-2 bg-card text-muted-foreground">
-              Or continue with
-            </span>
-          </div>
-          <SocialAuthSelector />
-          <div className="text-sm text-center">
-            Don&apos;t have an account?{" "}
-            <Link href={AUTH_PATH.REGISTER} className="font-medium underline">
-              Sign up
-            </Link>
-          </div>
-        </div>
-      </form>
-    </Form>
+              <div className="relative text-sm text-center after:border-border after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
+                <span className="relative z-10 px-2 bg-card text-muted-foreground">
+                  Or continue with
+                </span>
+              </div>
+              <SocialAuthSelector />
+              <div className="text-sm text-center">
+                Don&apos;t have an account?{" "}
+                <Link
+                  href={AUTH_PATH.REGISTER}
+                  className="font-medium underline"
+                >
+                  Sign up
+                </Link>
+              </div>
+            </div>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 }

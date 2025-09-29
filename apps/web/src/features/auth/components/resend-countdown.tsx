@@ -19,14 +19,14 @@ export default function ResendCountdown({ onCompleteClick }: Props) {
           targetDateRef.current = Date.now() + 59000;
         }}
       >
-        Resend email
+        Resend
       </div>
     );
   }
 
   return (
     <div>
-      Resend email in{" "}
+      Resend{" "}
       <Countdown
         date={targetDateRef.current}
         onComplete={() => setIsComplete(true)}

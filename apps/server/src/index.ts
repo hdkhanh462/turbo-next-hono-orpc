@@ -9,10 +9,11 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger as loggerMiddleware } from "hono/logger";
 
+import { env } from "./env";
 import { auth } from "./lib/auth";
-import { appRouter } from "./routers";
-import logger from "./lib/logger";
 import { createContext } from "./lib/context";
+import logger from "./lib/logger";
+import { appRouter } from "./routers";
 
 const app = new Hono();
 
@@ -20,7 +21,7 @@ app.use(loggerMiddleware());
 app.use(
   "/*",
   cors({
-    origin: process.env.CORS_ORIGIN || "",
+    origin: env.CORS_ORIGIN,
     allowMethods: ["GET", "POST", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
     credentials: true,
