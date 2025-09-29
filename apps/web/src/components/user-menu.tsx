@@ -1,60 +1,47 @@
+"use client";
+
+import { UserIcon } from "lucide-react";
+
+import UserDropdownContent from "@/components/user-dropdown-content";
+import { authClient } from "@/lib/auth-client";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@workspace/ui/components/avatar";
+import { Button } from "@workspace/ui/components/button";
 import {
   DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
-import { authClient } from "@/lib/auth-client";
-import { Button } from "@workspace/ui/components/button";
 import { Skeleton } from "@workspace/ui/components/skeleton";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
 
 export default function UserMenu() {
-  const router = useRouter();
-  const { data: session, isPending } = authClient.useSession();
+  const { data: sessionData, isPending } = authClient.useSession();
 
-  if (isPending) {
-    return <Skeleton className="h-9 w-24" />;
-  }
+  if (isPending) return <Skeleton className="size-8 rounded-full" />;
 
-  if (!session) {
-    return (
-      <Button variant="outline" asChild>
-        <Link href="/login">Sign In</Link>
-      </Button>
-    );
-  }
+  if (!sessionData) return null;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">{session.user.name}</Button>
+        <Button
+          variant="ghost"
+          className="rounded-full p-0 hover:bg-transparent"
+        >
+          <Avatar>
+            <AvatarImage
+              src={sessionData.user.image || ""}
+              alt="Profile image"
+            />
+            <AvatarFallback>
+              <UserIcon className="size-4" />
+            </AvatarFallback>
+          </Avatar>
+        </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="bg-card">
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>{session.user.email}</DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Button
-            variant="destructive"
-            className="w-full"
-            onClick={() => {
-              authClient.signOut({
-                fetchOptions: {
-                  onSuccess: () => {
-                    router.push("/");
-                  },
-                },
-              });
-            }}
-          >
-            Sign Out
-          </Button>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
+      <UserDropdownContent user={sessionData.user} />
     </DropdownMenu>
   );
 }

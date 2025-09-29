@@ -9,10 +9,10 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger as loggerMiddleware } from "hono/logger";
 
-import { auth } from "@/lib/auth";
-import { createContext } from "@/lib/context";
-import logger from "@/lib/logger";
-import { appRouter } from "@/routers";
+import { auth } from "./lib/auth";
+import { appRouter } from "./routers";
+import logger from "./lib/logger";
+import { createContext } from "./lib/context";
 
 const app = new Hono();
 

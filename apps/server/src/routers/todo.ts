@@ -1,7 +1,6 @@
 import z from "zod";
-
-import prisma from "@/db";
-import { publicProcedure } from "@/lib/orpc";
+import { publicProcedure } from "../lib/orpc";
+import prisma from "../db";
 
 export const todoRouter = {
   getAll: publicProcedure.handler(async () => {
