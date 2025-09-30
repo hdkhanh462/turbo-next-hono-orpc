@@ -32,7 +32,20 @@ export const todoRouter = {
 
   delete: publicProcedure
     .input(z.object({ id: z.number() }))
-    .handler(async ({ input }) => {
+    .errors({
+      NOT_FOUND: {
+        message: "Todo not found",
+        status: 404,
+        data: z.object({ id: z.number() }),
+      },
+    })
+    .handler(async ({ input, errors }) => {
+      const todo = await prisma.todo.findUnique({
+        where: { id: input.id },
+      });
+      if (!todo) {
+        throw errors.NOT_FOUND({ data: { id: input.id } });
+      }
       return await prisma.todo.delete({
         where: { id: input.id },
       });

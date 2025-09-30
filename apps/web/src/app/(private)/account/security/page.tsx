@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import PrivateData from "@/features/dashboard/components/private-data";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -26,12 +25,12 @@ export default function Page() {
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
                 <BreadcrumbLink asChild>
-                  <Link href="/dashboard">Dashboard</Link>
+                  <Link href="/account">Account</Link>
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator className="hidden md:block" />
               <BreadcrumbItem>
-                <BreadcrumbPage>Private Data</BreadcrumbPage>
+                <BreadcrumbPage>Security</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -43,7 +42,6 @@ export default function Page() {
           <div className="bg-muted/50 aspect-video rounded-xl" />
           <div className="bg-muted/50 aspect-video rounded-xl" />
         </div>
-        <PrivateData />
       </div>
     </>
   );

@@ -7,14 +7,15 @@ export const AUTH_PATH = {
 } as const;
 
 export const ACCOUNT_PATH = {
-  DASHBOARD: "/account/dashboard",
-  PROFILE: "/account/profile",
+  PROFILE: "/account",
+  DASHBOARD: "/dashboard",
   SECURITY: "/account/security",
   API_KEYS: "/account/api-keys",
   NOTIFICATIONS: "/account/notifications",
   SETTINGS: {
-    GENERAL: "/account/settings/general",
-    LANGUAGES: "/account/settings/languages",
-    NOTIFICATIONS: "/account/settings/notifications",
+    GENERAL: "/account/settings",
+    LANGUAGES: "/account/settings#languages",
+    NOTIFICATIONS: "/account/settings#notifications",
+    APPEARANCE: "/account/settings#appearance",
   },
 } as const;

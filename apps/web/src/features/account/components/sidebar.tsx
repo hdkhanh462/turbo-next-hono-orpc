@@ -3,19 +3,15 @@
 import {
   BookOpen,
   Bot,
-  Frame,
   LifeBuoy,
-  Map,
   MountainIcon,
-  PieChart,
   Send,
   Settings2,
   SquareTerminal,
 } from "lucide-react";
-import * as React from "react";
+import Link from "next/link";
 
 import { NavMain } from "@/components/sidebars/nav-main";
-import { NavProjects } from "@/components/sidebars/nav-projects";
 import { NavSecondary } from "@/components/sidebars/nav-secondary";
 import { NavUser } from "@/components/sidebars/nav-user";
 import {
@@ -27,13 +23,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@workspace/ui/components/sidebar";
+import { useAccountRoutes } from "@/features/account/hooks/use-routes";
 
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   navMain: [
     {
       title: "Playground",
@@ -132,35 +124,19 @@ const data = {
       icon: Send,
     },
   ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ],
 };
 
-export function DashboardSidebar({
+export function AccountSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
+  const routes = useAccountRoutes();
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="/">
+              <Link href="/">
                 <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                   <MountainIcon className="size-4" />
                 </div>
@@ -168,14 +144,13 @@ export function DashboardSidebar({
                   <span className="truncate font-medium">(App_Name)</span>
                   <span className="truncate text-xs">Dashboard</span>
                 </div>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <NavMain items={routes} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>

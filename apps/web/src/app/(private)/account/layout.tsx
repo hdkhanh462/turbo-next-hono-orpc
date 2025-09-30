@@ -1,6 +1,6 @@
 import { PropsWithChildren } from "react";
 
-import { DashboardSidebar } from "@/features/dashboard/components/sidebar";
+import { AccountSidebar } from "@/features/account/components/sidebar";
 import {
   SidebarInset,
   SidebarProvider,
@@ -9,7 +9,7 @@ import {
 export default function Layout({ children }: PropsWithChildren) {
   return (
     <SidebarProvider>
-      <DashboardSidebar />
+      <AccountSidebar />
       <SidebarInset>{children}</SidebarInset>
     </SidebarProvider>
   );
