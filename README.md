@@ -1,4 +1,4 @@
-# bts-pnpm-oxlint
+# bts-next-hono-orpc-template
 
 This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines Next.js, Hono, ORPC, and more.
 
@@ -54,7 +54,7 @@ The API is running at [http://localhost:3000](http://localhost:3000).
 ## Project Structure
 
 ```
-bts-pnpm-oxlint/
+bts-next-hono-orpc-template/
 ├── apps/
 │   ├── web/         # Frontend application (Next.js)
 │   └── server/      # Backend API (Hono, ORPC)
@@ -66,6 +66,15 @@ bts-pnpm-oxlint/
 - `pnpm build`: Build all applications
 - `pnpm dev:web`: Start only the web application
 - `pnpm dev:server`: Start only the server
+- `pnpm check`: Check lint code across all apps
 - `pnpm check-types`: Check TypeScript types across all apps
 - `pnpm db:push`: Push schema changes to database
 - `pnpm db:studio`: Open database studio UI
+
+
+## Optional Commands
+
+- To add shadcn/ui components, run:
+```shell
+pnpm dlx shadcn@canary add -c packages/ui <component_name>
+```

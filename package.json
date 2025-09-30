@@ -1,5 +1,5 @@
 {
-  "name": "bts-pnpm-oxlint",
+  "name": "bts-next-hono-orpc-template",
   "private": true,
   "type": "module",
   "workspaces": [
