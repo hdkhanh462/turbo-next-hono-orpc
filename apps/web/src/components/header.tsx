@@ -1,12 +1,13 @@
 "use client";
 
-import { Mountain } from "lucide-react";
+import { MountainIcon } from "lucide-react";
 import Link from "next/link";
 
 import InfoMenu from "@/components/info-menu";
 import { ModeToggle } from "@/components/mode-toggle";
 import NotificationMenu from "@/components/notification-menu";
 import UserMenu from "@/components/user-menu";
+import { useRoutes } from "@/hooks/use-routes";
 import { Button } from "@workspace/ui/components/button";
 import {
   NavigationMenu,
@@ -19,7 +20,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@workspace/ui/components/popover";
-import { useRoutes } from "@/hooks/use-routes";
 
 export default function Header() {
   const routes = useRoutes();
@@ -85,7 +85,7 @@ export default function Header() {
           {/* Main nav */}
           <div className="flex items-center gap-6">
             <Link href="/" className="text-primary hover:text-primary/90">
-              <Mountain />
+              <MountainIcon />
             </Link>
             {/* Navigation menu */}
             <NavigationMenu className="max-md:hidden">
