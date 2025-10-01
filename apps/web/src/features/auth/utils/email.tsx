@@ -1,19 +1,5 @@
 import { REGEXP_ONLY_DIGITS } from "input-otp";
-import { toast } from "sonner";
 
-import ResendCountdown from "@/features/auth/components/resend-countdown";
-import {
-  EmailFormInput,
-  emailSchema,
-  OTPFormInput,
-  otpSchema,
-  VerifyEmailInput,
-} from "@/features/auth/schemas/email.schema";
-import {
-  authClient,
-  getApiErrorDetail,
-  isApiErrorCode,
-} from "@/lib/auth-client";
 import { FormControl } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
 import {
@@ -24,6 +10,13 @@ import {
 } from "@workspace/ui/components/input-otp";
 import type { StepConfig } from "@workspace/ui/components/multiple-step-form";
 
+import apiErrorToast from "@/components/toasts/api-error.toast";
+import ResendCountdown from "@/features/auth/components/resend-countdown";
+import { VerifyEmailInput } from "@/features/auth/schemas/verify-email.schema";
+import { authClient } from "@/lib/auth-client";
+import { EMAIL_SCHEMA, EmailFormInput } from "@/schemas/email.schema";
+import { OTP_SCHEMA, OTPFormInput } from "@/schemas/otp.schema";
+
 export const handleResendClick = async (values: EmailFormInput) => {
   const { error } = await authClient.emailOtp.sendVerificationOtp({
     email: values.email,
@@ -31,20 +24,14 @@ export const handleResendClick = async (values: EmailFormInput) => {
   });
 
   if (error) {
-    if (isApiErrorCode(error?.code)) {
-      const errorDetail = getApiErrorDetail(error.code);
-      toast.error(errorDetail.title, {
-        description: errorDetail.description,
-      });
-    }
-    throw new Error(error.message);
+    apiErrorToast(error.code);
   }
 };
 
 export const verifiEmailEmailStep: StepConfig<EmailFormInput> = {
   title: "Verify Email",
   description: "Enter your email to receive the OTP",
-  schema: emailSchema,
+  schema: EMAIL_SCHEMA,
   async onSubmit(data) {
     await handleResendClick(data);
   },
@@ -66,7 +53,7 @@ export const verifiEmailOtpStep: StepConfig<OTPFormInput, VerifyEmailInput> = {
   title: "Verify OTP",
   description:
     "Enter the 6-digit OTP sent to your email, check spam folder if not found",
-  schema: otpSchema,
+  schema: OTP_SCHEMA,
   disableBackAction: true,
   fields: [
     {

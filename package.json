@@ -1,5 +1,5 @@
 {
-  "name": "bts-next-hono-orpc-template",
+  "name": "turbo-next-hono-orpc",
   "private": true,
   "type": "module",
   "workspaces": [

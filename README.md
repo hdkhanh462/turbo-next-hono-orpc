@@ -1,4 +1,4 @@
-# bts-next-hono-orpc-template
+# turbo-next-hono-orpc
 
 This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines Next.js, Hono, ORPC, and more.
 
@@ -54,7 +54,7 @@ The API is running at [http://localhost:3000](http://localhost:3000).
 ## Project Structure
 
 ```
-bts-next-hono-orpc-template/
+turbo-next-hono-orpc/
 ├── apps/
 │   ├── web/         # Frontend application (Next.js)
 │   └── server/      # Backend API (Hono, ORPC)

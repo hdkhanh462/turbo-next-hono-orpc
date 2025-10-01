@@ -1,5 +1,6 @@
 import "dotenv/config";
 
+import { serveStatic } from "@hono/node-server/serve-static";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
 import { onError } from "@orpc/server";
@@ -13,7 +14,9 @@ import { env } from "./env";
 import { auth } from "./lib/auth";
 import { createContext } from "./lib/context";
 import logger from "./lib/logger";
+import { IMAGES_UPLOAD_FOLDER, imageStorage } from "./lib/storage";
 import { appRouter } from "./routers";
+import { UPLOAD_IMAGE_SCHEMA } from "./schemas/upload.schema";
 
 const app = new Hono();
 
@@ -27,6 +30,7 @@ app.use(
     credentials: true,
   })
 );
+app.use("/static/*", serveStatic({ root: "./" }));
 
 app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 
@@ -73,6 +77,30 @@ app.use("/*", async (c, next) => {
   }
 
   await next();
+});
+
+app.post("api/upload/image", imageStorage.single("image"), (c) => {
+  const { image: imageFilename } = c.var.fileNames;
+  const parsedResult = UPLOAD_IMAGE_SCHEMA.safeParse(c.var.files);
+
+  if (!parsedResult.success) {
+    return c.json(
+      {
+        code: "INVALID_FILE_UPLOAD",
+        message: "Invalid file upload",
+        error: parsedResult.error.issues[0].message,
+      },
+      400
+    );
+  }
+
+  return c.json({
+    name: imageFilename,
+    originalName: parsedResult.data.image.name,
+    size: parsedResult.data.image.size,
+    type: parsedResult.data.image.type,
+    fileUrl: `${env.BETTER_AUTH_URL}/${IMAGES_UPLOAD_FOLDER}/${imageFilename}`,
+  });
 });
 
 app.get("/", (c) => {

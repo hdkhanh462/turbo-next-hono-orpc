@@ -3,6 +3,10 @@
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
+import { buttonVariants } from "@workspace/ui/components/button";
+import { MultipleStepForm } from "@workspace/ui/components/multiple-step-form";
+
+import apiErrorToast from "@/components/toasts/api-error.toast";
 import { AUTH_PATH } from "@/constants/paths";
 import {
   forgotPasswordEmailStep,
@@ -12,14 +16,8 @@ import {
 import {
   ForgotPasswordInput,
   forgotPasswordSchema,
-} from "@/features/auth/schemas/forgot-password";
-import {
-  authClient,
-  getApiErrorDetail,
-  isApiErrorCode,
-} from "@/lib/auth-client";
-import { buttonVariants } from "@workspace/ui/components/button";
-import { MultipleStepForm } from "@workspace/ui/components/multiple-step-form";
+} from "@/features/auth/schemas/forgot-password.schema";
+import { authClient } from "@/lib/auth-client";
 
 type Props = {
   initialValues?: Partial<ForgotPasswordInput>;
@@ -43,10 +41,11 @@ export default function ForgotPasswordForm({
     });
 
     if (error) {
-      if (isApiErrorCode(error?.code)) {
-        const errorDetail = getApiErrorDetail(error.code);
-        toast.error(errorDetail.title, {
-          description: errorDetail.description,
+      const isHandled = apiErrorToast(error.code);
+      if (!isHandled) {
+        toast.error("Reset password failed", {
+          description:
+            "There was an issue resetting your password. Please try again.",
         });
       }
       throw new Error(error.message);
