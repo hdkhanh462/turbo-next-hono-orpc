@@ -1,0 +1,104 @@
+import { REGEXP_ONLY_DIGITS } from "input-otp";
+import { toast } from "sonner";
+
+import ResendCountdown from "@/features/auth/components/resend-countdown";
+import {
+  EmailFormInput,
+  emailSchema,
+  OTPFormInput,
+  otpSchema,
+  VerifyEmailInput,
+} from "@/features/auth/schemas/email.schema";
+import {
+  authClient,
+  getApiErrorDetail,
+  isApiErrorCode,
+} from "@/lib/auth-client";
+import { FormControl } from "@workspace/ui/components/form";
+import { Input } from "@workspace/ui/components/input";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@workspace/ui/components/input-otp";
+import type { StepConfig } from "@workspace/ui/components/multiple-step-form";
+
+export const handleResendClick = async (values: EmailFormInput) => {
+  const { error } = await authClient.emailOtp.sendVerificationOtp({
+    email: values.email,
+    type: "email-verification",
+  });
+
+  if (error) {
+    if (isApiErrorCode(error?.code)) {
+      const errorDetail = getApiErrorDetail(error.code);
+      toast.error(errorDetail.title, {
+        description: errorDetail.description,
+      });
+    }
+    throw new Error(error.message);
+  }
+};
+
+export const verifiEmailEmailStep: StepConfig<EmailFormInput> = {
+  title: "Verify Email",
+  description: "Enter your email to receive the OTP",
+  schema: emailSchema,
+  async onSubmit(data) {
+    await handleResendClick(data);
+  },
+  fields: [
+    {
+      key: "email",
+      label: "Email",
+      description: "Please enter your email address to receive the OTP",
+      render: ({ field }) => (
+        <FormControl>
+          <Input placeholder="your@email.com" {...field} />
+        </FormControl>
+      ),
+    },
+  ],
+};
+
+export const verifiEmailOtpStep: StepConfig<OTPFormInput, VerifyEmailInput> = {
+  title: "Verify OTP",
+  description:
+    "Enter the 6-digit OTP sent to your email, check spam folder if not found",
+  schema: otpSchema,
+  disableBackAction: true,
+  fields: [
+    {
+      key: "otp",
+      render: ({ field, formData }) => (
+        <FormControl>
+          <div className="flex flex-col gap-2">
+            <div className="flex justify-center">
+              <InputOTP maxLength={6} pattern={REGEXP_ONLY_DIGITS} {...field}>
+                <InputOTPGroup>
+                  <InputOTPSlot index={0} />
+                  <InputOTPSlot index={1} />
+                  <InputOTPSlot index={2} />
+                </InputOTPGroup>
+                <InputOTPSeparator />
+                <InputOTPGroup>
+                  <InputOTPSlot index={3} />
+                  <InputOTPSlot index={4} />
+                  <InputOTPSlot index={5} />
+                </InputOTPGroup>
+              </InputOTP>
+            </div>
+            <div className="text-end text-sm text-muted-foreground mx-4">
+              <ResendCountdown
+                onCompleteClick={() =>
+                  handleResendClick({ email: formData.email })
+                }
+              />
+            </div>
+          </div>
+        </FormControl>
+      ),
+    },
+  ],
+};
