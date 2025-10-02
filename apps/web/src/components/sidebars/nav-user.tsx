@@ -1,14 +1,7 @@
 "use client";
 
-import { ChevronsUpDown, UserIcon } from "lucide-react";
+import { ChevronsUpDown } from "lucide-react";
 
-import UserDropdownContent from "@/components/user-dropdown-content";
-import { authClient } from "@/lib/auth-client";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@workspace/ui/components/avatar";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -19,6 +12,10 @@ import {
   SidebarMenuItem,
 } from "@workspace/ui/components/sidebar";
 import { Skeleton } from "@workspace/ui/components/skeleton";
+
+import UserAvatar from "@/components/user-avatar";
+import UserDropdownContent from "@/components/user-dropdown-content";
+import { authClient } from "@/lib/auth-client";
 
 export function NavUser() {
   const { data: sessionData, isPending } = authClient.useSession();
@@ -36,15 +33,7 @@ export function NavUser() {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar>
-                <AvatarImage
-                  src={sessionData?.user.image || ""}
-                  alt="User avatar"
-                />
-                <AvatarFallback>
-                  <UserIcon className="size-4" />
-                </AvatarFallback>
-              </Avatar>
+              <UserAvatar user={sessionData?.user} />
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">
                   {sessionData?.user.name}

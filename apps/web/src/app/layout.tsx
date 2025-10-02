@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "bts-pnpm-oxlint",
-  description: "bts-pnpm-oxlint",
+  title: "(App_Name)",
+  description: "(App_Name)",
 };
 
 export default function RootLayout({

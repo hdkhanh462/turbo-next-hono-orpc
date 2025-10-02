@@ -1,18 +1,11 @@
-import { LucideIcon } from "lucide-react";
+import { RouteType } from "@/types/route";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
 
-type Routes = {
-  title: string;
-  url: string;
-  icon?: LucideIcon;
-  isActive: boolean;
-};
-
-export function useRoutes(): Routes[] {
+export function useRoutes() {
   const pathname = usePathname();
 
-  return useMemo(() => {
+  return useMemo<RouteType[]>(() => {
     return [
       {
         title: "Home",
@@ -20,9 +13,9 @@ export function useRoutes(): Routes[] {
         isActive: pathname === "/",
       },
       {
-        title: "Features",
-        url: "/features",
-        isActive: pathname.startsWith("/features"),
+        title: "Todos",
+        url: "/todos",
+        isActive: pathname.startsWith("/todos"),
       },
       {
         title: "Pricing",

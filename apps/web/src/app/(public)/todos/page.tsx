@@ -15,6 +15,8 @@ import {
 } from "@workspace/ui/components/card";
 import { Checkbox } from "@workspace/ui/components/checkbox";
 import { Input } from "@workspace/ui/components/input";
+import { isDefinedError } from "@orpc/client";
+import { toast } from "sonner";
 
 export default function TodosPage() {
   const [newTodoText, setNewTodoText] = useState("");
@@ -39,6 +41,15 @@ export default function TodosPage() {
     orpc.todo.delete.mutationOptions({
       onSuccess: () => {
         todos.refetch();
+      },
+      onError: (error) => {
+        if (isDefinedError(error)) {
+          if (error.code === "NOT_FOUND") {
+            toast.error(error.message, {
+              description: "The todo you are trying to delete does not exist.",
+            });
+          }
+        }
       },
     })
   );

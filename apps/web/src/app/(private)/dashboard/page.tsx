@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import PrivateData from "@/features/dashboard/components/private-data";
 import {
   Breadcrumb,
@@ -9,7 +11,6 @@ import {
 } from "@workspace/ui/components/breadcrumb";
 import { Separator } from "@workspace/ui/components/separator";
 import { SidebarTrigger } from "@workspace/ui/components/sidebar";
-import Link from "next/link";
 
 export default function Page() {
   return (

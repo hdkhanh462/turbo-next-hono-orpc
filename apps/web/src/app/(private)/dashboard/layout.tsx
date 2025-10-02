@@ -1,6 +1,6 @@
 import { PropsWithChildren } from "react";
 
-import { DashboardSidebar } from "@/features/dashboard/components/dashboard-sidebar";
+import { DashboardSidebar } from "@/features/dashboard/components/sidebar";
 import {
   SidebarInset,
   SidebarProvider,

@@ -1,24 +1,22 @@
 "use client";
 
 import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { toast } from "sonner";
 
+import { buttonVariants } from "@workspace/ui/components/button";
+import { MultipleStepForm } from "@workspace/ui/components/multiple-step-form";
+
+import apiErrorToast from "@/components/toasts/api-error.toast";
 import { AUTH_PATH } from "@/constants/paths";
 import {
   VerifyEmailInput,
   verifyEmailSchema,
-} from "@/features/auth/schemas/email.schema";
+} from "@/features/auth/schemas/verify-email.schema";
 import {
   verifiEmailEmailStep,
   verifiEmailOtpStep,
 } from "@/features/auth/utils/email";
-import {
-  authClient,
-  getApiErrorDetail,
-  isApiErrorCode,
-} from "@/lib/auth-client";
-import { MultipleStepForm } from "@workspace/ui/components/multiple-step-form";
-import { buttonVariants } from "@workspace/ui/components/button";
-import { toast } from "sonner";
+import { authClient } from "@/lib/auth-client";
 
 type Props = {
   initialValues?: Partial<VerifyEmailInput>;
@@ -36,10 +34,11 @@ export default function VerifyEmailForm({
     });
 
     if (error) {
-      if (isApiErrorCode(error?.code)) {
-        const errorDetail = getApiErrorDetail(error.code);
-        toast.error(errorDetail.title, {
-          description: errorDetail.description,
+      const isHandled = apiErrorToast(error.code);
+      if (!isHandled) {
+        toast.error("Verification failed", {
+          description:
+            "The OTP you entered is incorrect or has expired. Please try again.",
         });
       }
       throw new Error(error.message);

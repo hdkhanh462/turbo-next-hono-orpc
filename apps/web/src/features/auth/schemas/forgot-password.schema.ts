@@ -1,16 +1,17 @@
 import z from "zod";
 
-import { passwordSchema } from "@/features/auth/schemas/auth.schema";
-import { emailSchema, otpSchema } from "@/features/auth/schemas/email.schema";
+import { PASSWORD_SCHEMA } from "@/schemas/password.schema";
+import { EMAIL_SCHEMA } from "@/schemas/email.schema";
+import { OTP_SCHEMA } from "@/schemas/otp.schema";
 
 export const resetPasswordFormSchema = z.object({
   newPassword: z.string().min(1, "New password is required"),
-  confirmNewPassword: passwordSchema,
+  confirmNewPassword: PASSWORD_SCHEMA,
 });
 
 export const forgotPasswordSchema = z.object({
-  ...emailSchema.shape,
-  ...otpSchema.shape,
+  ...EMAIL_SCHEMA.shape,
+  ...OTP_SCHEMA.shape,
   ...resetPasswordFormSchema.shape,
 });
 

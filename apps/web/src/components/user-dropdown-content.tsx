@@ -3,13 +3,6 @@ import { Bell, ChartColumn, LogOut, Settings, UserIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { ACCOUNT_PATH, AUTH_PATH } from "@/constants/paths";
-import { authClient, User } from "@/lib/auth-client";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@workspace/ui/components/avatar";
 import {
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -17,6 +10,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@workspace/ui/components/dropdown-menu";
+
+import UserAvatar from "@/components/user-avatar";
+import { ACCOUNT_PATH, AUTH_PATH } from "@/constants/paths";
+import { authClient, User } from "@/lib/auth-client";
 
 type UserDropdownContentProps = React.ComponentProps<
   typeof DropdownMenuContent
@@ -40,12 +37,7 @@ export default function UserDropdownContent({
     >
       <DropdownMenuLabel className="p-0">
         <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-          <Avatar>
-            <AvatarImage src={user.image || ""} alt="User avatar" />
-            <AvatarFallback>
-              <UserIcon className="size-4" />
-            </AvatarFallback>
-          </Avatar>
+          <UserAvatar user={user} />
           <div className="grid flex-1 text-sm leading-tight text-left">
             <span className="font-medium truncate">{user.name}</span>
             <span className="text-xs truncate text-muted-foreground">

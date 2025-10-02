@@ -6,7 +6,7 @@ export const env = createEnv({
     CORS_ORIGIN: z.url(),
     DATABASE_URL: z.url(),
     REDIS_URL: z.url(),
-    BETTER_AUTH_URL: z.url(),
+    BETTER_AUTH_URL: z.url().default("http://localhost:3000"),
     BETTER_AUTH_SECRET: z.string().min(1),
     GITHUB_CLIENT_ID: z.string().min(1),
     GITHUB_CLIENT_SECRET: z.string().min(1),

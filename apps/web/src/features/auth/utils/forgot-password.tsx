@@ -1,24 +1,6 @@
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { toast } from "sonner";
 
-import ResendCountdown from "@/features/auth/components/resend-countdown";
-import {
-  EmailFormInput,
-  emailSchema,
-  OTPFormInput,
-  otpSchema,
-  VerifyEmailInput,
-} from "@/features/auth/schemas/email.schema";
-import {
-  ForgotPasswordInput,
-  resetPasswordFormSchema,
-  ResetPasswordInput,
-} from "@/features/auth/schemas/forgot-password";
-import {
-  authClient,
-  getApiErrorDetail,
-  isApiErrorCode,
-} from "@/lib/auth-client";
 import { FormControl } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
 import {
@@ -30,19 +12,25 @@ import {
 import { StepConfig } from "@workspace/ui/components/multiple-step-form";
 import { PasswordInput } from "@workspace/ui/components/password-input";
 
+import apiErrorToast from "@/components/toasts/api-error.toast";
+import ResendCountdown from "@/features/auth/components/resend-countdown";
+import {
+  ForgotPasswordInput,
+  resetPasswordFormSchema,
+  ResetPasswordInput,
+} from "@/features/auth/schemas/forgot-password.schema";
+import { VerifyEmailInput } from "@/features/auth/schemas/verify-email.schema";
+import { authClient } from "@/lib/auth-client";
+import { EMAIL_SCHEMA, EmailFormInput } from "@/schemas/email.schema";
+import { OTP_SCHEMA, OTPFormInput } from "@/schemas/otp.schema";
+
 export const handleResendClick = async (values: EmailFormInput) => {
   const { error } = await authClient.forgetPassword.emailOtp({
     email: values.email,
   });
 
   if (error) {
-    if (isApiErrorCode(error?.code)) {
-      const errorDetail = getApiErrorDetail(error.code);
-      toast.error(errorDetail.title, {
-        description: errorDetail.description,
-      });
-    }
-    throw new Error(error.message);
+    apiErrorToast(error.code);
   }
 };
 
@@ -54,10 +42,11 @@ export const handleVerifiOTP = async (values: VerifyEmailInput) => {
   });
 
   if (error) {
-    if (isApiErrorCode(error?.code)) {
-      const errorDetail = getApiErrorDetail(error.code);
-      toast.error(errorDetail.title, {
-        description: errorDetail.description,
+    const isHandled = apiErrorToast(error.code);
+    if (!isHandled) {
+      toast.error("Verification failed", {
+        description:
+          "The OTP you entered is incorrect or has expired. Please try again.",
       });
     }
     throw new Error(error.message);
@@ -67,7 +56,7 @@ export const handleVerifiOTP = async (values: VerifyEmailInput) => {
 export const forgotPasswordEmailStep: StepConfig<EmailFormInput> = {
   title: "Forgot Password",
   description: "Enter your email to receive a verification code",
-  schema: emailSchema,
+  schema: EMAIL_SCHEMA,
   async onSubmit(data) {
     await handleResendClick(data);
   },
@@ -92,7 +81,7 @@ export const forgotPasswordOtpStep: StepConfig<
   title: "Enter Verification Code",
   description:
     "Please enter the 6-digit code sent to your email. Check your spam or junk folder if you don't see it",
-  schema: otpSchema,
+  schema: OTP_SCHEMA,
   async onSubmit(_, data) {
     await handleVerifiOTP(data);
   },

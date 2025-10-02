@@ -8,17 +8,6 @@ import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { AUTH_PATH } from "@/constants/paths";
-import SocialAuthSelector from "@/features/auth/components/social-auth-seletor";
-import {
-  RegisterInput,
-  registerSchema,
-} from "@/features/auth/schemas/auth.schema";
-import {
-  authClient,
-  getApiErrorDetail,
-  isApiErrorCode,
-} from "@/lib/auth-client";
 import { Button } from "@workspace/ui/components/button";
 import {
   Form,
@@ -30,6 +19,15 @@ import {
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
 import { PasswordInput } from "@workspace/ui/components/password-input";
+
+import apiErrorToast from "@/components/toasts/api-error.toast";
+import { AUTH_PATH } from "@/constants/paths";
+import SocialAuthSelector from "@/features/auth/components/social-auth-seletor";
+import {
+  RegisterInput,
+  registerSchema,
+} from "@/features/auth/schemas/auth.schema";
+import { authClient } from "@/lib/auth-client";
 
 export function RegisterForm() {
   const router = useRouter();
@@ -49,13 +47,9 @@ export function RegisterForm() {
         ...values,
       });
 
-      if (isApiErrorCode(error?.code)) {
-        form.setValue("password", "");
-        const errorDetail = getApiErrorDetail(error?.code);
-        toast.error(errorDetail.title, {
-          description: errorDetail.description,
-        });
-        return;
+      if (error) {
+        apiErrorToast(error.code);
+        throw new Error(error.message);
       }
       router.push(AUTH_PATH.LOGIN);
       toast.success("Account registed successfully");
