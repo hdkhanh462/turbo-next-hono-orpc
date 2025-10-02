@@ -1,10 +1,11 @@
 "use client";
 
+import { isDefinedError } from "@orpc/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Loader2, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
-import { orpc } from "@/utils/orpc";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -15,8 +16,8 @@ import {
 } from "@workspace/ui/components/card";
 import { Checkbox } from "@workspace/ui/components/checkbox";
 import { Input } from "@workspace/ui/components/input";
-import { isDefinedError } from "@orpc/client";
-import { toast } from "sonner";
+
+import { orpc } from "@/utils/orpc";
 
 export default function TodosPage() {
   const [newTodoText, setNewTodoText] = useState("");

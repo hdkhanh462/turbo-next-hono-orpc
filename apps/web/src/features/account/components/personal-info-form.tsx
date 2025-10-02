@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import AvatarCropperInput from "@workspace/ui/components/avatar-cropper-input";
+import AvatarCropperInput from "@/components/avatar-cropper-input";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -32,11 +32,12 @@ import {
 import { useUploadImageMutation } from "@/hooks/use-upload-image-mutation";
 import { authClient } from "@/lib/auth-client";
 import { Label } from "@workspace/ui/components/label";
+import { Loader } from "@workspace/ui/components/loader";
 
 export default function PersonalInfoForm() {
   const { data: sessionData, isPending } = authClient.useSession();
 
-  const { mutate } = useUploadImageMutation({
+  const { mutate, isPending: isUploadImagePending } = useUploadImageMutation({
     async onSuccess(output) {
       await authClient.updateUser(
         { image: output.fileUrl },
@@ -75,6 +76,7 @@ export default function PersonalInfoForm() {
       {
         onSuccess: () => {
           toast.success("Personal information updated successfully");
+          form.reset(values);
         },
       }
     );
@@ -95,6 +97,7 @@ export default function PersonalInfoForm() {
           className="size-24"
           initialImageUrl={sessionData?.user.image}
           cropOptions={{ outputType: "image/webp" }}
+          disabled={isUploadImagePending}
           onImageChange={(image) => image && mutate({ image })}
           onError={(error) => toast.error(error)}
         />
@@ -102,21 +105,32 @@ export default function PersonalInfoForm() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid gap-2">
               <Label>Email</Label>
-              <Input
-                placeholder="Enter your email"
-                disabled
-                value={sessionData?.user.email}
-              />
+              <div className="flex gap-2 items-center">
+                <Input
+                  disabled
+                  placeholder="Enter your email"
+                  value={sessionData?.user.email || ""}
+                />
+                <Button
+                  type="button"
+                  variant={
+                    sessionData?.user.emailVerified ? "outline" : "default"
+                  }
+                  disabled={isPending || sessionData?.user.emailVerified}
+                >
+                  {sessionData?.user.emailVerified ? "Verified" : "Verify"}
+                </Button>
+              </div>
             </div>
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Full Name</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Enter your name"
+                      placeholder="Enter your full name"
                       disabled={isPending}
                       {...field}
                     />
@@ -134,6 +148,7 @@ export default function PersonalInfoForm() {
                   !form.formState.isDirty
                 }
               >
+                <Loader isLoading={form.formState.isSubmitting} />
                 Save
               </Button>
             </div>

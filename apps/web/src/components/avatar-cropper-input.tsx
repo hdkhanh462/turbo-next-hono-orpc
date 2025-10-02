@@ -30,6 +30,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@workspace/ui/components/dialog";
+import { Loader } from "@workspace/ui/components/loader";
 import { Slider } from "@workspace/ui/components/slider";
 import {
   FileUploadOptions,
@@ -156,6 +157,7 @@ type Props = {
   initialImageUrl?: string | null;
   cropOptions?: CropOptions;
   inputOptions?: Pick<FileUploadOptions, "accept" | "maxSize">;
+  disabled?: boolean;
   onImageChange?: (image: File | null) => void;
   onError?: (error: string) => void;
 };
@@ -166,6 +168,7 @@ export default function AvatarCropperInput({
   initialImageUrl,
   cropOptions,
   inputOptions,
+  disabled,
   onImageChange,
   onError,
 }: Props) {
@@ -192,6 +195,7 @@ export default function AvatarCropperInput({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [finalImageUrl, setFinalImageUrl] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isApplying, setIsApplying] = useState(false);
 
   const initialCropAreaRef = useRef<Area | null>(null);
 
@@ -204,14 +208,23 @@ export default function AvatarCropperInput({
   // State for zoom level
   const [zoom, setZoom] = useState(1);
 
+  const isCropChanged = useCallback(() => {
+    if (previewUrl === initialImageUrl) {
+      if (!initialCropAreaRef.current || !croppedAreaPixels) return false;
+      return (
+        initialCropAreaRef.current.x !== croppedAreaPixels.x ||
+        initialCropAreaRef.current.y !== croppedAreaPixels.y ||
+        initialCropAreaRef.current.width !== croppedAreaPixels.width ||
+        initialCropAreaRef.current.height !== croppedAreaPixels.height
+      );
+    }
+
+    return true;
+  }, [previewUrl, croppedAreaPixels, initialImageUrl]);
+
   // Callback for Cropper to provide crop data - Wrap with useCallback
   const handleCropChange = useCallback((pixels: Area | null) => {
-    if (
-      pixels?.width !== initialCropAreaRef.current?.width ||
-      pixels?.height !== initialCropAreaRef.current?.height
-    ) {
-      setCroppedAreaPixels(pixels);
-    }
+    setCroppedAreaPixels(pixels);
   }, []);
 
   const handleApply = async () => {
@@ -230,6 +243,7 @@ export default function AvatarCropperInput({
         ? { name: file.name, type: file.type }
         : getImageUrlMeta(initialImageUrl || "");
 
+      setIsApplying(true);
       // 1. Get the cropped image blob using the helper
       const croppedBlob = await getCroppedImg(
         previewUrl,
@@ -265,6 +279,8 @@ export default function AvatarCropperInput({
     } catch {
       // Close the dialog even if cropping fails
       setIsDialogOpen(false);
+    } finally {
+      setIsApplying(false);
     }
   };
 
@@ -284,16 +300,6 @@ export default function AvatarCropperInput({
       openFileDialog();
     }
   };
-
-  const isCropChanged = useCallback(() => {
-    if (!initialCropAreaRef.current || !croppedAreaPixels) return false;
-    return (
-      initialCropAreaRef.current.x !== croppedAreaPixels.x ||
-      initialCropAreaRef.current.y !== croppedAreaPixels.y ||
-      initialCropAreaRef.current.width !== croppedAreaPixels.width ||
-      initialCropAreaRef.current.height !== croppedAreaPixels.height
-    );
-  }, [croppedAreaPixels]);
 
   useEffect(() => {
     const currentFinalUrl = finalImageUrl;
@@ -338,8 +344,13 @@ export default function AvatarCropperInput({
     }
     if (!isDialogOpen) {
       initialCropAreaRef.current = null;
+
+      setTimeout(() => {
+        setPreviewUrl(initialImageUrl || null);
+        setZoom(1);
+      }, 300);
     }
-  }, [isDialogOpen, croppedAreaPixels, previewUrl]);
+  }, [isDialogOpen, croppedAreaPixels, initialImageUrl, isCropChanged]);
 
   return (
     <div className="flex flex-col items-center gap-2">
@@ -347,7 +358,7 @@ export default function AvatarCropperInput({
         {/* Drop area - uses finalImageUrl */}
         <button
           className={cn(
-            "hover:cursor-pointer group border-input hover:bg-accent/50 data-[dragging=true]:bg-accent/50 focus-visible:border-ring focus-visible:ring-ring/50 relative flex size-16 items-center justify-center overflow-hidden rounded-full border border-dashed transition-colors outline-none focus-visible:ring-[3px] has-disabled:pointer-events-none has-disabled:opacity-50 has-[img]:border-none",
+            "disabled:hover:cursor-not-allowed hover:cursor-pointer group border-input hover:bg-accent/50 data-[dragging=true]:bg-accent/50 focus-visible:border-ring focus-visible:ring-ring/50 relative flex size-16 items-center justify-center overflow-hidden rounded-full border border-dashed transition-colors outline-none focus-visible:ring-[3px] has-disabled:pointer-events-none has-disabled:opacity-50 has-[img]:border-none",
             className
           )}
           onClick={handleClick}
@@ -355,6 +366,7 @@ export default function AvatarCropperInput({
           onDragLeave={handleDragLeave}
           onDragOver={handleDragOver}
           onDrop={handleDrop}
+          disabled={disabled}
           data-dragging={isDragging || undefined}
           aria-label={finalImageUrl ? "Change image" : "Upload image"}
         >
@@ -425,15 +437,28 @@ export default function AvatarCropperInput({
                 <span>Crop image</span>
               </div>
               <div className="flex items-center gap-2">
+                {isCropChanged() && (
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setPreviewUrl(initialImageUrl || null);
+                      setCroppedAreaPixels(null);
+                      setZoom(1);
+                    }}
+                  >
+                    Reset
+                  </Button>
+                )}
                 <Button variant="outline" onClick={openFileDialog}>
                   Pick
                 </Button>
                 <Button
                   className="-my-1"
                   onClick={handleApply}
-                  disabled={!previewUrl}
+                  disabled={!previewUrl || isApplying || !isCropChanged()}
                   autoFocus
                 >
+                  <Loader isLoading={isApplying} />
                   Apply
                 </Button>
               </div>
