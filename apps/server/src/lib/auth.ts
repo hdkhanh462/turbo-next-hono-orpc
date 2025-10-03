@@ -1,51 +1,36 @@
 import { betterAuth, type BetterAuthOptions } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { emailOTP } from "better-auth/plugins/email-otp";
 
 import prisma from "../db";
+import { env } from "../env";
 import { sendEmail } from "./email";
 import { redis } from "./redis";
-import { env } from "../env";
 
 export const auth = betterAuth<BetterAuthOptions>({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
-  plugins: [
-    emailOTP({
-      overrideDefaultEmailVerification: true,
-      async sendVerificationOTP({ email, otp, type }) {
-        switch (type) {
-          case "sign-in":
-            await sendEmail({
-              to: email,
-              subject: "Sign in to your account",
-              text: `Your sign-in code is: ${otp}`,
-            });
-            break;
-          case "email-verification":
-            await sendEmail({
-              to: email,
-              subject: "Verify your email address",
-              text: `Your verification code is: ${otp}`,
-            });
-            break;
-          case "forget-password":
-            await sendEmail({
-              to: email,
-              subject: "Reset your password",
-              text: `Your password reset code is: ${otp}`,
-            });
-            break;
-        }
-      },
-    }),
-  ],
   trustedOrigins: [env.CORS_ORIGIN],
+  emailVerification: {
+    autoSignInAfterVerification: true,
+    sendVerificationEmail: async ({ user, url }) => {
+      await sendEmail({
+        to: user.email,
+        subject: "Verify your email address",
+        text: `Click the link to verify your email: ${url}`,
+      });
+    },
+  },
   emailAndPassword: {
     enabled: true,
     autoSignIn: false,
-    requireEmailVerification: true,
+    sendResetPassword: async ({ user, url }) => {
+      await sendEmail({
+        to: user.email,
+        subject: "Reset your password",
+        text: `Click the link to reset your password: ${url}`,
+      });
+    },
   },
   advanced: {
     defaultCookieAttributes: {

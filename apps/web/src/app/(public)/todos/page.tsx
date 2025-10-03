@@ -2,10 +2,6 @@
 
 import { isDefinedError } from "@orpc/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Loader2, Trash2 } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
-
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -16,6 +12,11 @@ import {
 } from "@workspace/ui/components/card";
 import { Checkbox } from "@workspace/ui/components/checkbox";
 import { Input } from "@workspace/ui/components/input";
+import { Loader } from "@workspace/ui/components/loader";
+import { LoadingSwap } from "@workspace/ui/components/loading-swap";
+import { Trash2 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 import { orpc } from "@/utils/orpc";
 
@@ -92,60 +93,69 @@ export default function TodosPage() {
               type="submit"
               disabled={createMutation.isPending || !newTodoText.trim()}
             >
-              {createMutation.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                "Add"
-              )}
+              <Loader isLoading={createMutation.isPending} />
+              Add
             </Button>
           </form>
 
-          {todos.isLoading ? (
-            <div className="flex justify-center py-4">
-              <Loader2 className="h-6 w-6 animate-spin" />
-            </div>
-          ) : todos.data?.length === 0 ? (
-            <p className="py-4 text-center">No todos yet. Add one above!</p>
-          ) : (
-            <ul className="space-y-2">
-              {todos.data?.map((todo) => (
-                <li
-                  key={todo.id}
-                  className="flex items-center justify-between rounded-md border p-2"
-                >
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      checked={todo.completed}
-                      onCheckedChange={() =>
-                        handleToggleTodo(todo.id, todo.completed)
-                      }
-                      id={`todo-${todo.id}`}
-                    />
-                    <label
-                      htmlFor={`todo-${todo.id}`}
-                      className={`${
-                        todo.completed
-                          ? "line-through text-muted-foreground"
-                          : ""
-                      }`}
-                    >
-                      {todo.text}
-                    </label>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDeleteTodo(todo.id)}
-                    aria-label="Delete todo"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          )}
+          <LoadingSwap isLoading={todos.isLoading}>
+            {todos.data?.length === 0 ? (
+              <p className="py-4 text-center">No todos yet. Add one above!</p>
+            ) : (
+              <ul className="space-y-2">
+                {todos.data?.map((todo) => (
+                  <TodoItem
+                    key={`todo-${todo.id}`}
+                    todo={todo}
+                    onToggle={handleToggleTodo}
+                    onDeleteClick={handleDeleteTodo}
+                  />
+                ))}
+              </ul>
+            )}
+          </LoadingSwap>
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+type TodoItemProps = {
+  todo: {
+    id: number;
+    text: string;
+    completed: boolean;
+  };
+  onToggle: (id: number, completed: boolean) => void;
+  onDeleteClick: (id: number) => void;
+};
+
+function TodoItem({ todo, onToggle, onDeleteClick }: TodoItemProps) {
+  return (
+    <li className="flex items-center justify-between rounded-md border p-2">
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          checked={todo.completed}
+          onCheckedChange={() => onToggle(todo.id, todo.completed)}
+          id={`todo-${todo.id}`}
+        />
+        <label
+          htmlFor={`todo-${todo.id}`}
+          className={`${
+            todo.completed ? "line-through text-muted-foreground" : ""
+          }`}
+        >
+          {todo.text}
+        </label>
+      </div>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => onDeleteClick(todo.id)}
+        aria-label="Delete todo"
+      >
+        <Trash2 className="h-4 w-4" />
+      </Button>
+    </li>
   );
 }
