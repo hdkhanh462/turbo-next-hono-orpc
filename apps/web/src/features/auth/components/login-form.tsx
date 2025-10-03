@@ -1,23 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useTransition } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-
-import { AUTH_PATH } from "@/constants/paths";
-import SocialAuthSelector from "@/features/auth/components/social-auth-seletor";
-import VerifyEmailForm from "@/features/auth/components/verify-email-form";
-import { LoginInput, loginSchema } from "@/features/auth/schemas/auth.schema";
-import { handleResendClick } from "@/features/auth/utils/email";
-import {
-  authClient,
-  getApiErrorDetail,
-  isApiErrorCode,
-} from "@/lib/auth-client";
 import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent } from "@workspace/ui/components/card";
 import { Checkbox } from "@workspace/ui/components/checkbox";
@@ -31,6 +14,18 @@ import {
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
 import { PasswordInput } from "@workspace/ui/components/password-input";
+import { Loader2 } from "lucide-react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useTransition } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+
+import apiErrorToast from "@/components/toasts/api-error.toast";
+import { AUTH_PATH } from "@/constants/paths";
+import SocialAuthSelector from "@/features/auth/components/social-auth-seletor";
+import { LoginInput, loginSchema } from "@/features/auth/schemas/auth.schema";
+import { authClient, isApiErrorCode } from "@/lib/auth-client";
 
 export default function LoginForm() {
   const searchParams = useSearchParams();
@@ -38,8 +33,6 @@ export default function LoginForm() {
 
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-
-  const [isEmailVerified, setIsEmailVerified] = useState(true);
 
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -56,34 +49,34 @@ export default function LoginForm() {
         ...values,
       });
 
-      if (isApiErrorCode(error?.code)) {
+      if (error) {
         form.setValue("password", "");
 
-        if (error.code === "EMAIL_NOT_VERIFIED") {
-          await handleResendClick({ email: values.email });
-          setIsEmailVerified(false);
+        if (isApiErrorCode(error.code) && error.code === "EMAIL_NOT_VERIFIED") {
+          await authClient.sendVerificationEmail(
+            {
+              email: form.getValues("email"),
+              callbackURL:
+                process.env.NEXT_PUBLIC_CLIENT_URL + AUTH_PATH.LOGIN_REDIRECT,
+            },
+            {
+              onSuccess: () => {
+                toast.warning("Verify your email", {
+                  description:
+                    "We sent you a new verification email. Please check your inbox and your spam folder.",
+                });
+              },
+            }
+          );
+          return;
         }
-
-        const errorDetail = getApiErrorDetail(error?.code);
-        toast.warning(errorDetail.title, {
-          description: errorDetail.description,
-        });
-        return;
+        apiErrorToast(error.code);
       }
       router.push(
         nextPath?.startsWith("/") ? nextPath : AUTH_PATH.LOGIN_REDIRECT
       );
       toast("👋 Wellcome back!");
     });
-  }
-
-  if (!isEmailVerified) {
-    return (
-      <VerifyEmailForm
-        initialValues={{ email: form.getValues("email"), otp: "" }}
-        initialStep={1}
-      />
-    );
   }
 
   return (

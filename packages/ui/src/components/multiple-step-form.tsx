@@ -101,8 +101,8 @@ export function MultipleStepForm<TMainSchema>({
         try {
           setIsSubmitting(true);
           await currentStep.onSubmit(data, updatedData);
-        } catch (error) {
-          console.error("Error in step submit:", error);
+        } catch {
+          // console.error("Error in step submit:", error);
           isContinue = false;
         } finally {
           setIsSubmitting(false);
@@ -118,8 +118,8 @@ export function MultipleStepForm<TMainSchema>({
         const parsedData = schema.parse(updatedData);
         await onSubmit(parsedData);
         setIsComplete(true);
-      } catch (error) {
-        console.log("Error in final submit:", error);
+      } catch {
+        // console.log("Error in final submit:", error);
       } finally {
         setIsSubmitting(false);
       }
@@ -188,10 +188,7 @@ export function MultipleStepForm<TMainSchema>({
                   >
                     <ArrowLeft className="mr-1 size-4" /> Back
                   </Button>
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting || !form.formState.isDirty}
-                  >
+                  <Button type="submit" disabled={isSubmitting}>
                     {step === steps.length - 1 ? (
                       <>
                         {isSubmitting && (

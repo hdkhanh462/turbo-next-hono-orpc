@@ -1,9 +1,7 @@
-import { emailOTPClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 
 export const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_SERVER_URL,
-  plugins: [emailOTPClient()],
 });
 
 export type Session = typeof authClient.$Infer.Session;
@@ -53,38 +51,6 @@ const errorCodes = {
       title: "Email chưa được xác minh",
       description:
         "Vui lòng xác minh địa chỉ email của bạn trước khi đăng nhập.",
-    },
-  },
-  INVALID_OTP: {
-    en: {
-      title: "Invalid OTP",
-      description: "The OTP you entered is incorrect. Please try again.",
-    },
-    vi: {
-      title: "Mã OTP không hợp lệ",
-      description: "Mã OTP bạn đã nhập không đúng. Vui lòng thử lại.",
-    },
-  },
-  OTP_EXPIRED: {
-    en: {
-      title: "OTP Expired",
-      description: "The OTP has expired. Please request a new one.",
-    },
-    vi: {
-      title: "Mã OTP đã hết hạn",
-      description: "Mã OTP đã hết hạn. Vui lòng yêu cầu mã mới.",
-    },
-  },
-  TOO_MANY_ATTEMPTS: {
-    en: {
-      title: "Too Many Attempts",
-      description:
-        "You have made too many unsuccessful attempts. Please try again later.",
-    },
-    vi: {
-      title: "Quá nhiều lần thử",
-      description:
-        "Bạn đã thực hiện quá nhiều lần thử không thành công. Vui lòng thử lại sau.",
     },
   },
 } satisfies ErrorTypes;

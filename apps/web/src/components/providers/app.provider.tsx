@@ -29,7 +29,7 @@ export default function AppProvider({ children }: PropsWithChildren) {
         {children}
         <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-right" />
       </QueryClientProvider>
-      <Toaster richColors duration={3000} />
+      <Toaster richColors duration={5000} />
     </ThemeProvider>
   );
 }

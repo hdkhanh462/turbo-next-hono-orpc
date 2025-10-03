@@ -21,20 +21,26 @@ export default function UserAvatar({
 }: Props) {
   return (
     <Avatar className={className}>
-      <Suspense
-        fallback={
-          <AvatarFallback>
-            {fallback ? fallback : <UserIcon className="size-4" />}
-          </AvatarFallback>
-        }
-      >
-        <Image
-          src={user.image || ""}
-          alt="User Avatar"
-          width={size}
-          height={size}
-        />
-      </Suspense>
+      {user.image ? (
+        <Suspense
+          fallback={
+            <AvatarFallback>
+              {fallback ? fallback : <UserIcon className="size-4" />}
+            </AvatarFallback>
+          }
+        >
+          <Image
+            src={user.image || ""}
+            alt="User Avatar"
+            width={size}
+            height={size}
+          />
+        </Suspense>
+      ) : (
+        <AvatarFallback>
+          {fallback ? fallback : <UserIcon className="size-4" />}
+        </AvatarFallback>
+      )}
     </Avatar>
   );
 }
