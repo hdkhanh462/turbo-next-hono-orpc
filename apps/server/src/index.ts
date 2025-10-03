@@ -38,6 +38,13 @@ export const apiHandler = new OpenAPIHandler(appRouter, {
   plugins: [
     new OpenAPIReferencePlugin({
       schemaConverters: [new ZodToJsonSchemaConverter()],
+      docsTitle: "(App_Name) - API Reference",
+      specGenerateOptions: {
+        info: {
+          title: "(App_Name) - API Reference",
+          version: "0.1.2",
+        },
+      },
     }),
   ],
   interceptors: [
